@@ -44,6 +44,92 @@ export type Database = {
         }
         Relationships: []
       }
+      coupon_redemptions: {
+        Row: {
+          amount_discounted: number
+          context: string
+          coupon_id: string
+          created_at: string
+          id: string
+          reference_id: string | null
+          user_id: string
+        }
+        Insert: {
+          amount_discounted: number
+          context: string
+          coupon_id: string
+          created_at?: string
+          id?: string
+          reference_id?: string | null
+          user_id: string
+        }
+        Update: {
+          amount_discounted?: number
+          context?: string
+          coupon_id?: string
+          created_at?: string
+          id?: string
+          reference_id?: string | null
+          user_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "coupon_redemptions_coupon_id_fkey"
+            columns: ["coupon_id"]
+            isOneToOne: false
+            referencedRelation: "coupons"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      coupons: {
+        Row: {
+          code: string
+          created_at: string
+          created_by: string | null
+          expires_at: string | null
+          id: string
+          is_active: boolean
+          kind: Database["public"]["Enums"]["coupon_kind"]
+          max_uses: number | null
+          min_amount: number
+          per_user_limit: number
+          scope: Database["public"]["Enums"]["coupon_scope"]
+          uses_count: number
+          value: number
+        }
+        Insert: {
+          code: string
+          created_at?: string
+          created_by?: string | null
+          expires_at?: string | null
+          id?: string
+          is_active?: boolean
+          kind: Database["public"]["Enums"]["coupon_kind"]
+          max_uses?: number | null
+          min_amount?: number
+          per_user_limit?: number
+          scope?: Database["public"]["Enums"]["coupon_scope"]
+          uses_count?: number
+          value: number
+        }
+        Update: {
+          code?: string
+          created_at?: string
+          created_by?: string | null
+          expires_at?: string | null
+          id?: string
+          is_active?: boolean
+          kind?: Database["public"]["Enums"]["coupon_kind"]
+          max_uses?: number | null
+          min_amount?: number
+          per_user_limit?: number
+          scope?: Database["public"]["Enums"]["coupon_scope"]
+          uses_count?: number
+          value?: number
+        }
+        Relationships: []
+      }
       orders: {
         Row: {
           created_at: string
@@ -97,6 +183,68 @@ export type Database = {
             columns: ["product_id"]
             isOneToOne: false
             referencedRelation: "products"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      payment_intents: {
+        Row: {
+          amount_paid: number
+          checkout_url: string | null
+          coupon_id: string | null
+          created_at: string
+          credit_amount: number
+          currency: string
+          external_id: string | null
+          id: string
+          paid_at: string | null
+          provider: Database["public"]["Enums"]["payment_provider"]
+          provider_reference: string
+          raw_payload: Json | null
+          status: Database["public"]["Enums"]["payment_status"]
+          updated_at: string
+          user_id: string
+        }
+        Insert: {
+          amount_paid: number
+          checkout_url?: string | null
+          coupon_id?: string | null
+          created_at?: string
+          credit_amount: number
+          currency?: string
+          external_id?: string | null
+          id?: string
+          paid_at?: string | null
+          provider: Database["public"]["Enums"]["payment_provider"]
+          provider_reference: string
+          raw_payload?: Json | null
+          status?: Database["public"]["Enums"]["payment_status"]
+          updated_at?: string
+          user_id: string
+        }
+        Update: {
+          amount_paid?: number
+          checkout_url?: string | null
+          coupon_id?: string | null
+          created_at?: string
+          credit_amount?: number
+          currency?: string
+          external_id?: string | null
+          id?: string
+          paid_at?: string | null
+          provider?: Database["public"]["Enums"]["payment_provider"]
+          provider_reference?: string
+          raw_payload?: Json | null
+          status?: Database["public"]["Enums"]["payment_status"]
+          updated_at?: string
+          user_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "payment_intents_coupon_id_fkey"
+            columns: ["coupon_id"]
+            isOneToOne: false
+            referencedRelation: "coupons"
             referencedColumns: ["id"]
           },
         ]
@@ -201,6 +349,8 @@ export type Database = {
           created_at: string
           email: string | null
           id: string
+          is_suspended: boolean
+          suspended_reason: string | null
           telegram: string | null
           updated_at: string
           username: string
@@ -210,6 +360,8 @@ export type Database = {
           created_at?: string
           email?: string | null
           id: string
+          is_suspended?: boolean
+          suspended_reason?: string | null
           telegram?: string | null
           updated_at?: string
           username: string
@@ -219,6 +371,8 @@ export type Database = {
           created_at?: string
           email?: string | null
           id?: string
+          is_suspended?: boolean
+          suspended_reason?: string | null
           telegram?: string | null
           updated_at?: string
           username?: string
@@ -246,11 +400,82 @@ export type Database = {
         }
         Relationships: []
       }
+      wallet_transactions: {
+        Row: {
+          amount: number
+          balance_after: number
+          created_at: string
+          description: string | null
+          id: string
+          metadata: Json
+          reference_id: string | null
+          type: Database["public"]["Enums"]["wallet_tx_type"]
+          user_id: string
+        }
+        Insert: {
+          amount: number
+          balance_after: number
+          created_at?: string
+          description?: string | null
+          id?: string
+          metadata?: Json
+          reference_id?: string | null
+          type: Database["public"]["Enums"]["wallet_tx_type"]
+          user_id: string
+        }
+        Update: {
+          amount?: number
+          balance_after?: number
+          created_at?: string
+          description?: string | null
+          id?: string
+          metadata?: Json
+          reference_id?: string | null
+          type?: Database["public"]["Enums"]["wallet_tx_type"]
+          user_id?: string
+        }
+        Relationships: []
+      }
     }
     Views: {
       [_ in never]: never
     }
     Functions: {
+      admin_adjust_wallet: {
+        Args: { _amount: number; _description: string; _user_id: string }
+        Returns: number
+      }
+      credit_wallet_from_payment: {
+        Args: {
+          _external_id: string
+          _provider: Database["public"]["Enums"]["payment_provider"]
+          _provider_reference: string
+          _raw: Json
+        }
+        Returns: {
+          amount_paid: number
+          checkout_url: string | null
+          coupon_id: string | null
+          created_at: string
+          credit_amount: number
+          currency: string
+          external_id: string | null
+          id: string
+          paid_at: string | null
+          provider: Database["public"]["Enums"]["payment_provider"]
+          provider_reference: string
+          raw_payload: Json | null
+          status: Database["public"]["Enums"]["payment_status"]
+          updated_at: string
+          user_id: string
+        }
+        SetofOptions: {
+          from: "*"
+          to: "payment_intents"
+          isOneToOne: true
+          isSetofReturn: false
+        }
+      }
       has_role: {
         Args: {
           _role: Database["public"]["Enums"]["app_role"]
@@ -258,31 +483,73 @@ export type Database = {
         }
         Returns: boolean
       }
-      purchase_product: {
-        Args: { _product_id: string }
-        Returns: {
-          created_at: string
-          delivered_credential: string
-          delivered_notes: string | null
-          delivered_password: string
-          id: string
-          login_id: string | null
-          price: number
-          product_id: string
-          product_name: string
-          status: string
-          user_id: string
-        }
-        SetofOptions: {
-          from: "*"
-          to: "orders"
-          isOneToOne: true
-          isSetofReturn: false
-        }
+      purchase_product:
+        | {
+            Args: { _product_id: string }
+            Returns: {
+              created_at: string
+              delivered_credential: string
+              delivered_notes: string | null
+              delivered_password: string
+              id: string
+              login_id: string | null
+              price: number
+              product_id: string
+              product_name: string
+              status: string
+              user_id: string
+            }
+            SetofOptions: {
+              from: "*"
+              to: "orders"
+              isOneToOne: true
+              isSetofReturn: false
+            }
+          }
+        | {
+            Args: { _coupon_code?: string; _product_id: string }
+            Returns: {
+              created_at: string
+              delivered_credential: string
+              delivered_notes: string | null
+              delivered_password: string
+              id: string
+              login_id: string | null
+              price: number
+              product_id: string
+              product_name: string
+              status: string
+              user_id: string
+            }
+            SetofOptions: {
+              from: "*"
+              to: "orders"
+              isOneToOne: true
+              isSetofReturn: false
+            }
+          }
+      quote_coupon: {
+        Args: { _amount: number; _code: string; _context: string }
+        Returns: Json
+      }
+      set_user_suspended: {
+        Args: { _reason: string; _suspended: boolean; _user_id: string }
+        Returns: undefined
       }
     }
     Enums: {
       app_role: "admin" | "user"
+      coupon_kind: "percent" | "fixed"
+      coupon_scope: "funding" | "purchase" | "both"
+      payment_provider: "monnify" | "binance_pay"
+      payment_status: "pending" | "paid" | "failed" | "expired" | "cancelled"
+      wallet_tx_type:
+        | "funding"
+        | "purchase"
+        | "admin_credit"
+        | "admin_debit"
+        | "refund"
+        | "coupon_bonus"
     }
     CompositeTypes: {
       [_ in never]: never
@@ -411,6 +678,18 @@ export const Constants = {
   public: {
     Enums: {
       app_role: ["admin", "user"],
+      coupon_kind: ["percent", "fixed"],
+      coupon_scope: ["funding", "purchase", "both"],
+      payment_provider: ["monnify", "binance_pay"],
+      payment_status: ["pending", "paid", "failed", "expired", "cancelled"],
+      wallet_tx_type: [
+        "funding",
+        "purchase",
+        "admin_credit",
+        "admin_debit",
+        "refund",
+        "coupon_bonus",
+      ],
     },
   },
 } as const
