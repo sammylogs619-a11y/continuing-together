@@ -304,6 +304,7 @@ export type Database = {
           is_active: boolean
           name: string
           price: number
+          seller_id: string | null
           stock: number
           updated_at: string
         }
@@ -317,6 +318,7 @@ export type Database = {
           is_active?: boolean
           name: string
           price: number
+          seller_id?: string | null
           stock?: number
           updated_at?: string
         }
@@ -330,6 +332,7 @@ export type Database = {
           is_active?: boolean
           name?: string
           price?: number
+          seller_id?: string | null
           stock?: number
           updated_at?: string
         }
@@ -339,6 +342,13 @@ export type Database = {
             columns: ["category_id"]
             isOneToOne: false
             referencedRelation: "categories"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "products_seller_id_fkey"
+            columns: ["seller_id"]
+            isOneToOne: false
+            referencedRelation: "sellers"
             referencedColumns: ["id"]
           },
         ]
@@ -376,6 +386,83 @@ export type Database = {
           telegram?: string | null
           updated_at?: string
           username?: string
+        }
+        Relationships: []
+      }
+      seller_transactions: {
+        Row: {
+          amount: number
+          balance_after: number
+          created_at: string
+          description: string | null
+          id: string
+          metadata: Json
+          reference_id: string | null
+          seller_id: string
+          type: Database["public"]["Enums"]["seller_tx_type"]
+        }
+        Insert: {
+          amount: number
+          balance_after: number
+          created_at?: string
+          description?: string | null
+          id?: string
+          metadata?: Json
+          reference_id?: string | null
+          seller_id: string
+          type: Database["public"]["Enums"]["seller_tx_type"]
+        }
+        Update: {
+          amount?: number
+          balance_after?: number
+          created_at?: string
+          description?: string | null
+          id?: string
+          metadata?: Json
+          reference_id?: string | null
+          seller_id?: string
+          type?: Database["public"]["Enums"]["seller_tx_type"]
+        }
+        Relationships: [
+          {
+            foreignKeyName: "seller_transactions_seller_id_fkey"
+            columns: ["seller_id"]
+            isOneToOne: false
+            referencedRelation: "sellers"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      sellers: {
+        Row: {
+          balance: number
+          business_description: string | null
+          business_name: string
+          created_at: string
+          id: string
+          logo_url: string | null
+          status: Database["public"]["Enums"]["seller_status"]
+          updated_at: string
+        }
+        Insert: {
+          balance?: number
+          business_description?: string | null
+          business_name: string
+          created_at?: string
+          id: string
+          logo_url?: string | null
+          status?: Database["public"]["Enums"]["seller_status"]
+          updated_at?: string
+        }
+        Update: {
+          balance?: number
+          business_description?: string | null
+          business_name?: string
+          created_at?: string
+          id?: string
+          logo_url?: string | null
+          status?: Database["public"]["Enums"]["seller_status"]
+          updated_at?: string
         }
         Relationships: []
       }
@@ -436,6 +523,53 @@ export type Database = {
         }
         Relationships: []
       }
+      withdrawal_requests: {
+        Row: {
+          account_name: string
+          account_number: string
+          admin_note: string | null
+          amount: number
+          bank_name: string
+          created_at: string
+          id: string
+          seller_id: string
+          status: Database["public"]["Enums"]["withdrawal_status"]
+          updated_at: string
+        }
+        Insert: {
+          account_name: string
+          account_number: string
+          admin_note?: string | null
+          amount: number
+          bank_name: string
+          created_at?: string
+          id?: string
+          seller_id: string
+          status?: Database["public"]["Enums"]["withdrawal_status"]
+          updated_at?: string
+        }
+        Update: {
+          account_name?: string
+          account_number?: string
+          admin_note?: string | null
+          amount?: number
+          bank_name?: string
+          created_at?: string
+          id?: string
+          seller_id?: string
+          status?: Database["public"]["Enums"]["withdrawal_status"]
+          updated_at?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "withdrawal_requests_seller_id_fkey"
+            columns: ["seller_id"]
+            isOneToOne: false
+            referencedRelation: "sellers"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
     }
     Views: {
       [_ in never]: never
@@ -444,6 +578,31 @@ export type Database = {
       admin_adjust_wallet: {
         Args: { _amount: number; _description: string; _user_id: string }
         Returns: number
+      }
+      admin_set_withdrawal_status: {
+        Args: {
+          _id: string
+          _note?: string
+          _status: Database["public"]["Enums"]["withdrawal_status"]
+        }
+        Returns: {
+          account_name: string
+          account_number: string
+          admin_note: string | null
+          amount: number
+          bank_name: string
+          created_at: string
+          id: string
+          seller_id: string
+          status: Database["public"]["Enums"]["withdrawal_status"]
+          updated_at: string
+        }
+        SetofOptions: {
+          from: "*"
+          to: "withdrawal_requests"
+          isOneToOne: true
+          isSetofReturn: false
+        }
       }
       credit_wallet_from_payment: {
         Args: {
@@ -532,6 +691,55 @@ export type Database = {
         Args: { _amount: number; _code: string; _context: string }
         Returns: Json
       }
+      register_seller: {
+        Args: {
+          _business_description: string
+          _business_name: string
+          _logo_url: string
+        }
+        Returns: {
+          balance: number
+          business_description: string | null
+          business_name: string
+          created_at: string
+          id: string
+          logo_url: string | null
+          status: Database["public"]["Enums"]["seller_status"]
+          updated_at: string
+        }
+        SetofOptions: {
+          from: "*"
+          to: "sellers"
+          isOneToOne: true
+          isSetofReturn: false
+        }
+      }
+      request_withdrawal: {
+        Args: {
+          _account_name: string
+          _account_number: string
+          _amount: number
+          _bank_name: string
+        }
+        Returns: {
+          account_name: string
+          account_number: string
+          admin_note: string | null
+          amount: number
+          bank_name: string
+          created_at: string
+          id: string
+          seller_id: string
+          status: Database["public"]["Enums"]["withdrawal_status"]
+          updated_at: string
+        }
+        SetofOptions: {
+          from: "*"
+          to: "withdrawal_requests"
+          isOneToOne: true
+          isSetofReturn: false
+        }
+      }
       set_user_suspended: {
         Args: { _reason: string; _suspended: boolean; _user_id: string }
         Returns: undefined
@@ -543,6 +751,13 @@ export type Database = {
       coupon_scope: "funding" | "purchase" | "both"
       payment_provider: "monnify" | "binance_pay"
       payment_status: "pending" | "paid" | "failed" | "expired" | "cancelled"
+      seller_status: "pending" | "active" | "suspended"
+      seller_tx_type:
+        | "sale"
+        | "withdrawal_hold"
+        | "withdrawal_refund"
+        | "withdrawal_paid"
+        | "admin_adjustment"
       wallet_tx_type:
         | "funding"
         | "purchase"
@@ -550,6 +765,7 @@ export type Database = {
         | "admin_debit"
         | "refund"
         | "coupon_bonus"
+      withdrawal_status: "pending" | "approved" | "rejected" | "paid"
     }
     CompositeTypes: {
       [_ in never]: never
@@ -682,6 +898,14 @@ export const Constants = {
       coupon_scope: ["funding", "purchase", "both"],
       payment_provider: ["monnify", "binance_pay"],
       payment_status: ["pending", "paid", "failed", "expired", "cancelled"],
+      seller_status: ["pending", "active", "suspended"],
+      seller_tx_type: [
+        "sale",
+        "withdrawal_hold",
+        "withdrawal_refund",
+        "withdrawal_paid",
+        "admin_adjustment",
+      ],
       wallet_tx_type: [
         "funding",
         "purchase",
@@ -690,6 +914,7 @@ export const Constants = {
         "refund",
         "coupon_bonus",
       ],
+      withdrawal_status: ["pending", "approved", "rejected", "paid"],
     },
   },
 } as const
