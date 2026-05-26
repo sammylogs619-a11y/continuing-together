@@ -169,30 +169,39 @@ function Index() {
 
       {/* Header */}
       <header className="border-b bg-background sticky top-0 z-30">
-        <div className="mx-auto flex max-w-7xl items-center gap-4 px-4 py-3">
-          <a href="/" className="flex items-center gap-2">
-            <div className="grid h-9 w-9 place-items-center rounded-lg bg-brand text-brand-foreground font-black">
-              S
-            </div>
-            <span className="text-lg font-extrabold tracking-tight">SAMMY STORE</span>
-          </a>
+        <div className="mx-auto max-w-7xl px-4 py-3 flex flex-col gap-3 sm:flex-row sm:items-center sm:gap-4">
+          <div className="flex items-center justify-between gap-2 sm:gap-4">
+            <a href="/" className="flex items-center gap-2 min-w-0">
+              <div className="grid h-9 w-9 shrink-0 place-items-center rounded-lg bg-brand text-brand-foreground font-black">
+                S
+              </div>
+              <span className="text-lg font-extrabold tracking-tight truncate">SAMMY STORE</span>
+            </a>
+            <a
+              href="/products"
+              className="inline-flex items-center gap-1 rounded-md bg-brand text-brand-foreground px-3 py-2 text-sm font-medium hover:opacity-90 shrink-0 sm:hidden"
+            >
+              <Menu className="h-4 w-4" /> Catalog
+            </a>
+          </div>
           <a
             href="/products"
-            className="inline-flex items-center gap-1 rounded-md bg-brand text-brand-foreground px-3 py-2 text-sm font-medium hover:opacity-90 shrink-0"
+            className="hidden sm:inline-flex items-center gap-1 rounded-md bg-brand text-brand-foreground px-3 py-2 text-sm font-medium hover:opacity-90 shrink-0"
           >
             <Menu className="h-4 w-4" /> Catalog
           </a>
-          <div className="ml-auto flex flex-1 max-w-2xl items-center rounded-md border bg-background overflow-hidden">
+          <div className="sm:ml-auto flex flex-1 sm:max-w-2xl items-center rounded-md border bg-background overflow-hidden">
             <input
-              className="flex-1 px-3 py-2 text-sm outline-none bg-transparent"
+              className="flex-1 min-w-0 px-3 py-2 text-sm outline-none bg-transparent"
               placeholder="Search on SAMMY STORE"
             />
-            <button className="grid h-10 w-10 place-items-center bg-muted hover:bg-muted/70">
+            <button className="grid h-10 w-10 shrink-0 place-items-center bg-muted hover:bg-muted/70">
               <Search className="h-4 w-4" />
             </button>
           </div>
         </div>
       </header>
+
 
       {/* Hero */}
       <section className="mx-auto max-w-7xl px-4 pt-6">
