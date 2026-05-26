@@ -11,19 +11,18 @@ function SettingsPage() {
   return (
     <AdminPage title="Settings" description="Configure store, payment provider and admin account.">
       <section className="rounded-xl border bg-card p-5 space-y-2">
-        <h2 className="font-semibold flex items-center gap-2"><CreditCard className="h-4 w-4 text-primary" /> Monnify keys</h2>
+        <h2 className="font-semibold flex items-center gap-2"><CreditCard className="h-4 w-4 text-primary" /> NOWPayments keys</h2>
         <p className="text-sm text-muted-foreground">
-          Monnify API credentials are stored as encrypted server secrets. To set or rotate them,
-          open <strong>Cloud → Secrets</strong> and add these three values:
+          NOWPayments API credentials are stored as encrypted server secrets. To set or rotate them,
+          open <strong>Cloud → Secrets</strong> and add these two values:
         </p>
         <ul className="mt-2 text-sm font-mono space-y-1 pl-4 list-disc">
-          <li>MONNIFY_API_KEY</li>
-          <li>MONNIFY_SECRET_KEY</li>
-          <li>MONNIFY_CONTRACT_CODE</li>
+          <li>NOWPAYMENTS_API_KEY</li>
+          <li>NOWPAYMENTS_IPN_SECRET</li>
         </ul>
         <p className="text-xs text-muted-foreground pt-2">
-          All payments go directly to the Monnify account these keys belong to. Successful payments
-          are auto-credited to the user's wallet via webhook.
+          All crypto payments go directly to the NOWPayments account these keys belong to.
+          Confirmed payments are auto-credited to the user's wallet via IPN webhook.
         </p>
       </section>
 
@@ -33,8 +32,8 @@ function SettingsPage() {
         {[
           { label: "Store name", value: "Sammy Store" },
           { label: "Default currency", value: "Nigerian Naira (₦)" },
-          { label: "Payment provider", value: "Monnify" },
-          { label: "Webhook URL", value: "/api/public/monnify-webhook" },
+          { label: "Payment provider", value: "NOWPayments (crypto)" },
+          { label: "Webhook URL", value: "/api/public/nowpayments-webhook" },
         ].map((row) => (
           <div key={row.label} className="flex items-center justify-between p-4 gap-4">
             <div className="text-sm font-medium">{row.label}</div>

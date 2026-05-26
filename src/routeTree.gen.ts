@@ -45,7 +45,6 @@ import { Route as AdminProductLoginsRouteImport } from './routes/admin.product-l
 import { Route as AdminNotificationsRouteImport } from './routes/admin.notifications'
 import { Route as AdminCouponsRouteImport } from './routes/admin.coupons'
 import { Route as ApiPublicNowpaymentsWebhookRouteImport } from './routes/api/public/nowpayments-webhook'
-import { Route as ApiPublicMonnifyWebhookRouteImport } from './routes/api/public/monnify-webhook'
 
 const SupportRoute = SupportRouteImport.update({
   id: '/support',
@@ -228,11 +227,6 @@ const ApiPublicNowpaymentsWebhookRoute =
     path: '/api/public/nowpayments-webhook',
     getParentRoute: () => rootRouteImport,
   } as any)
-const ApiPublicMonnifyWebhookRoute = ApiPublicMonnifyWebhookRouteImport.update({
-  id: '/api/public/monnify-webhook',
-  path: '/api/public/monnify-webhook',
-  getParentRoute: () => rootRouteImport,
-} as any)
 
 export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
@@ -270,7 +264,6 @@ export interface FileRoutesByFullPath {
   '/admin/': typeof AdminIndexRoute
   '/dashboard/': typeof DashboardIndexRoute
   '/seller/': typeof SellerIndexRoute
-  '/api/public/monnify-webhook': typeof ApiPublicMonnifyWebhookRoute
   '/api/public/nowpayments-webhook': typeof ApiPublicNowpaymentsWebhookRoute
 }
 export interface FileRoutesByTo {
@@ -306,7 +299,6 @@ export interface FileRoutesByTo {
   '/admin': typeof AdminIndexRoute
   '/dashboard': typeof DashboardIndexRoute
   '/seller': typeof SellerIndexRoute
-  '/api/public/monnify-webhook': typeof ApiPublicMonnifyWebhookRoute
   '/api/public/nowpayments-webhook': typeof ApiPublicNowpaymentsWebhookRoute
 }
 export interface FileRoutesById {
@@ -346,7 +338,6 @@ export interface FileRoutesById {
   '/admin/': typeof AdminIndexRoute
   '/dashboard/': typeof DashboardIndexRoute
   '/seller/': typeof SellerIndexRoute
-  '/api/public/monnify-webhook': typeof ApiPublicMonnifyWebhookRoute
   '/api/public/nowpayments-webhook': typeof ApiPublicNowpaymentsWebhookRoute
 }
 export interface FileRouteTypes {
@@ -387,7 +378,6 @@ export interface FileRouteTypes {
     | '/admin/'
     | '/dashboard/'
     | '/seller/'
-    | '/api/public/monnify-webhook'
     | '/api/public/nowpayments-webhook'
   fileRoutesByTo: FileRoutesByTo
   to:
@@ -423,7 +413,6 @@ export interface FileRouteTypes {
     | '/admin'
     | '/dashboard'
     | '/seller'
-    | '/api/public/monnify-webhook'
     | '/api/public/nowpayments-webhook'
   id:
     | '__root__'
@@ -462,7 +451,6 @@ export interface FileRouteTypes {
     | '/admin/'
     | '/dashboard/'
     | '/seller/'
-    | '/api/public/monnify-webhook'
     | '/api/public/nowpayments-webhook'
   fileRoutesById: FileRoutesById
 }
@@ -479,7 +467,6 @@ export interface RootRouteChildren {
   SellerRoute: typeof SellerRouteWithChildren
   SignupRoute: typeof SignupRoute
   SupportRoute: typeof SupportRoute
-  ApiPublicMonnifyWebhookRoute: typeof ApiPublicMonnifyWebhookRoute
   ApiPublicNowpaymentsWebhookRoute: typeof ApiPublicNowpaymentsWebhookRoute
 }
 
@@ -737,13 +724,6 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof ApiPublicNowpaymentsWebhookRouteImport
       parentRoute: typeof rootRouteImport
     }
-    '/api/public/monnify-webhook': {
-      id: '/api/public/monnify-webhook'
-      path: '/api/public/monnify-webhook'
-      fullPath: '/api/public/monnify-webhook'
-      preLoaderRoute: typeof ApiPublicMonnifyWebhookRouteImport
-      parentRoute: typeof rootRouteImport
-    }
   }
 }
 
@@ -833,7 +813,6 @@ const rootRouteChildren: RootRouteChildren = {
   SellerRoute: SellerRouteWithChildren,
   SignupRoute: SignupRoute,
   SupportRoute: SupportRoute,
-  ApiPublicMonnifyWebhookRoute: ApiPublicMonnifyWebhookRoute,
   ApiPublicNowpaymentsWebhookRoute: ApiPublicNowpaymentsWebhookRoute,
 }
 export const routeTree = rootRouteImport

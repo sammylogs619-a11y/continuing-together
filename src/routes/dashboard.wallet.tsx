@@ -4,7 +4,7 @@ import { Wallet, Loader2, CheckCircle2 } from "lucide-react";
 import { useAuth } from "@/hooks/use-auth";
 import { supabase } from "@/integrations/supabase/client";
 import { useServerFn } from "@tanstack/react-start";
-import { initFunding, verifyMonnifyPayment } from "@/lib/payments.functions";
+import { initNowPaymentsFunding } from "@/lib/nowpayments.functions";
 import { toast } from "sonner";
 import { formatNaira } from "@/lib/utils";
 
@@ -12,16 +12,25 @@ export const Route = createFileRoute("/dashboard/wallet")({ component: WalletPag
 
 type Tx = { id: string; type: string; amount: number; balance_after: number; description: string | null; created_at: string };
 
+const PAY_CURRENCIES = [
+  { value: "usdttrc20", label: "USDT (TRC20)" },
+  { value: "usdterc20", label: "USDT (ERC20)" },
+  { value: "btc", label: "Bitcoin (BTC)" },
+  { value: "eth", label: "Ethereum (ETH)" },
+  { value: "bnbbsc", label: "BNB (BSC)" },
+  { value: "ltc", label: "Litecoin (LTC)" },
+];
+
 function WalletPage() {
   const { user } = useAuth();
   const [balance, setBalance] = useState(0);
   const [amount, setAmount] = useState("");
+  const [payCurrency, setPayCurrency] = useState("usdttrc20");
   const [coupon, setCoupon] = useState("");
   const [bonus, setBonus] = useState<number | null>(null);
   const [loading, setLoading] = useState(false);
   const [history, setHistory] = useState<Tx[]>([]);
-  const init = useServerFn(initFunding);
-  const verify = useServerFn(verifyMonnifyPayment);
+  const init = useServerFn(initNowPaymentsFunding);
 
   async function load() {
     if (!user) return;
@@ -35,20 +44,19 @@ function WalletPage() {
   }
   useEffect(() => { load(); /* eslint-disable-next-line */ }, [user]);
 
+  // Handle return from NOWPayments checkout
   useEffect(() => {
+    if (!user) return;
     const url = new URL(window.location.href);
-    const ref = url.searchParams.get("ref");
-    if (!ref || !user) return;
-    (async () => {
-      try {
-        const r = await verify({ data: { reference: ref } });
-        if (r.status === "paid") toast.success("Payment confirmed — wallet credited");
-        else toast.info(`Payment status: ${r.status}`);
-      } catch (e: any) { toast.error(e?.message ?? "Verify failed"); }
-      url.searchParams.delete("ref");
-      window.history.replaceState({}, "", url.toString());
-      load();
-    })();
+    const npRef = url.searchParams.get("np_ref");
+    const npCancel = url.searchParams.get("np_cancel");
+    if (!npRef && !npCancel) return;
+    if (npRef) toast.success("Payment received — wallet will be credited once confirmed on-chain.");
+    if (npCancel) toast.info("Payment cancelled");
+    url.searchParams.delete("np_ref");
+    url.searchParams.delete("np_cancel");
+    window.history.replaceState({}, "", url.toString());
+    load();
     // eslint-disable-next-line
   }, [user]);
 
@@ -68,7 +76,7 @@ function WalletPage() {
     if (!n || n < 100) return toast.error("Minimum amount ₦100");
     setLoading(true);
     try {
-      const r = await init({ data: { amount: n, couponCode: coupon.trim() || undefined } });
+      const r = await init({ data: { amount: n, payCurrency, couponCode: coupon.trim() || undefined } });
       window.location.href = r.checkoutUrl;
     } catch (e: any) {
       toast.error(e?.message ?? "Payment init failed");
@@ -80,7 +88,7 @@ function WalletPage() {
     <div className="space-y-6">
       <div>
         <h1 className="text-2xl font-extrabold tracking-tight">Wallet</h1>
-        <p className="text-sm text-muted-foreground mt-1">Fund your wallet with Monnify and view transaction history.</p>
+        <p className="text-sm text-muted-foreground mt-1">Fund your wallet with cryptocurrency via NOWPayments.</p>
       </div>
 
       <div className="rounded-2xl border bg-card p-6 flex items-center justify-between">
@@ -94,13 +102,21 @@ function WalletPage() {
       </div>
 
       <div className="rounded-2xl border bg-card p-6 space-y-4">
-        <h2 className="font-semibold">Add funds with Monnify</h2>
-        <p className="text-xs text-muted-foreground">Pay securely with Card, Bank Transfer or USSD. Funds reflect instantly.</p>
+        <h2 className="font-semibold">Add funds with crypto (NOWPayments)</h2>
+        <p className="text-xs text-muted-foreground">Pay with USDT, BTC, ETH and more. Funds reflect once the network confirms your transaction.</p>
 
         <div className="relative">
           <span className="absolute left-3 top-1/2 -translate-y-1/2 text-muted-foreground">₦</span>
           <input type="number" min="100" value={amount} onChange={(e) => { setAmount(e.target.value); setBonus(null); }}
             placeholder="5000" className="w-full rounded-lg border bg-background pl-7 pr-3 py-2.5 outline-none focus:ring-2 focus:ring-primary/20" />
+        </div>
+
+        <div>
+          <label className="text-xs font-medium text-muted-foreground">Pay with</label>
+          <select value={payCurrency} onChange={(e) => setPayCurrency(e.target.value)}
+            className="mt-1 w-full rounded-lg border bg-background px-3 py-2.5 text-sm">
+            {PAY_CURRENCIES.map((c) => <option key={c.value} value={c.value}>{c.label}</option>)}
+          </select>
         </div>
 
         <div className="flex gap-2">
@@ -117,7 +133,7 @@ function WalletPage() {
         <button onClick={pay} disabled={loading}
           className="w-full rounded-lg bg-primary text-primary-foreground py-3 font-semibold disabled:opacity-50 inline-flex items-center justify-center gap-2">
           {loading && <Loader2 className="h-4 w-4 animate-spin" />}
-          {loading ? "Redirecting…" : "Pay with Monnify"}
+          {loading ? "Redirecting…" : "Pay with crypto"}
         </button>
       </div>
 

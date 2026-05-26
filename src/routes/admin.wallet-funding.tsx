@@ -30,7 +30,7 @@ function Page() {
   useEffect(() => { load(); /* eslint-disable-next-line */ }, [filter]);
 
   return (
-    <AdminPage title="Wallet Funding" description="All real payment sessions from Monnify and Binance Pay.">
+    <AdminPage title="Wallet Funding" description="All crypto payment sessions from NOWPayments.">
       <div className="flex flex-wrap gap-2">
         {(["all", "pending", "paid", "failed"] as const).map((s) => (
           <button key={s} onClick={() => setFilter(s)}
