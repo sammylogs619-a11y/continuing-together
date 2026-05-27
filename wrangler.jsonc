@@ -1,7 +1,12 @@
 {
   "$schema": "node_modules/wrangler/config-schema.json",
-  "name": "continuing-together",
+  "name": "sammystorelogs",
   "compatibility_date": "2025-09-24",
   "compatibility_flags": ["nodejs_compat"],
   "main": "src/server.ts",
+  "observability": { "enabled": true },
+  "routes": [
+    { "pattern": "sammystorelogs.com", "custom_domain": true },
+    { "pattern": "www.sammystorelogs.com", "custom_domain": true }
+  ]
 }
