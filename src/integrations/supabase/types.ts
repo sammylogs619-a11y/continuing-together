@@ -14,6 +14,24 @@ export type Database = {
   }
   public: {
     Tables: {
+      app_settings: {
+        Row: {
+          key: string
+          updated_at: string
+          value: Json
+        }
+        Insert: {
+          key: string
+          updated_at?: string
+          value: Json
+        }
+        Update: {
+          key?: string
+          updated_at?: string
+          value?: Json
+        }
+        Relationships: []
+      }
       categories: {
         Row: {
           created_at: string
@@ -200,6 +218,7 @@ export type Database = {
           paid_at: string | null
           provider: Database["public"]["Enums"]["payment_provider"]
           provider_reference: string
+          purpose: string
           raw_payload: Json | null
           status: Database["public"]["Enums"]["payment_status"]
           updated_at: string
@@ -217,6 +236,7 @@ export type Database = {
           paid_at?: string | null
           provider: Database["public"]["Enums"]["payment_provider"]
           provider_reference: string
+          purpose?: string
           raw_payload?: Json | null
           status?: Database["public"]["Enums"]["payment_status"]
           updated_at?: string
@@ -234,6 +254,7 @@ export type Database = {
           paid_at?: string | null
           provider?: Database["public"]["Enums"]["payment_provider"]
           provider_reference?: string
+          purpose?: string
           raw_payload?: Json | null
           status?: Database["public"]["Enums"]["payment_status"]
           updated_at?: string
@@ -441,6 +462,8 @@ export type Database = {
           created_at: string
           id: string
           logo_url: string | null
+          paid_registration_at: string | null
+          registration_payment_ref: string | null
           status: Database["public"]["Enums"]["seller_status"]
           updated_at: string
         }
@@ -451,6 +474,8 @@ export type Database = {
           created_at?: string
           id: string
           logo_url?: string | null
+          paid_registration_at?: string | null
+          registration_payment_ref?: string | null
           status?: Database["public"]["Enums"]["seller_status"]
           updated_at?: string
         }
@@ -461,6 +486,8 @@ export type Database = {
           created_at?: string
           id?: string
           logo_url?: string | null
+          paid_registration_at?: string | null
+          registration_payment_ref?: string | null
           status?: Database["public"]["Enums"]["seller_status"]
           updated_at?: string
         }
@@ -615,6 +642,8 @@ export type Database = {
           created_at: string
           id: string
           logo_url: string | null
+          paid_registration_at: string | null
+          registration_payment_ref: string | null
           status: Database["public"]["Enums"]["seller_status"]
           updated_at: string
         }
@@ -650,6 +679,59 @@ export type Database = {
           isSetofReturn: false
         }
       }
+      confirm_seller_registration_payment: {
+        Args: { _external_id: string; _provider_reference: string; _raw: Json }
+        Returns: {
+          balance: number
+          business_description: string | null
+          business_name: string
+          created_at: string
+          id: string
+          logo_url: string | null
+          paid_registration_at: string | null
+          registration_payment_ref: string | null
+          status: Database["public"]["Enums"]["seller_status"]
+          updated_at: string
+        }
+        SetofOptions: {
+          from: "*"
+          to: "sellers"
+          isOneToOne: true
+          isSetofReturn: false
+        }
+      }
+      create_seller_registration_intent: {
+        Args: {
+          _checkout_url: string
+          _external_id: string
+          _raw: Json
+          _reference: string
+        }
+        Returns: {
+          amount_paid: number
+          checkout_url: string | null
+          coupon_id: string | null
+          created_at: string
+          credit_amount: number
+          currency: string
+          external_id: string | null
+          id: string
+          paid_at: string | null
+          provider: Database["public"]["Enums"]["payment_provider"]
+          provider_reference: string
+          purpose: string
+          raw_payload: Json | null
+          status: Database["public"]["Enums"]["payment_status"]
+          updated_at: string
+          user_id: string
+        }
+        SetofOptions: {
+          from: "*"
+          to: "payment_intents"
+          isOneToOne: true
+          isSetofReturn: false
+        }
+      }
       credit_wallet_from_payment: {
         Args: {
           _external_id: string
@@ -669,6 +751,7 @@ export type Database = {
           paid_at: string | null
           provider: Database["public"]["Enums"]["payment_provider"]
           provider_reference: string
+          purpose: string
           raw_payload: Json | null
           status: Database["public"]["Enums"]["payment_status"]
           updated_at: string
@@ -750,6 +833,8 @@ export type Database = {
           created_at: string
           id: string
           logo_url: string | null
+          paid_registration_at: string | null
+          registration_payment_ref: string | null
           status: Database["public"]["Enums"]["seller_status"]
           updated_at: string
         }
