@@ -42,16 +42,40 @@ export const Route = createFileRoute("/api/public/nowpayments-webhook")({
         const reference = payload?.order_id;
         if (!reference) return new Response("missing order_id", { status: 400 });
 
-        // Only credit on confirmed/finished states
+        // Only act on confirmed/finished states
         if (status === "finished" || status === "confirmed") {
-          const { error } = await supabaseAdmin.rpc("credit_wallet_from_payment", {
-            _provider: "nowpayments",
-            _provider_reference: reference,
-            _external_id: String(payload?.payment_id ?? ""),
-            _raw: payload,
-          });
+          // Look up the intent to route by purpose
+          const { data: intent, error: lookupErr } = await supabaseAdmin
+            .from("payment_intents")
+            .select("purpose")
+            .eq("provider", "nowpayments")
+            .eq("provider_reference", reference)
+            .maybeSingle();
+          if (lookupErr || !intent) {
+            console.error("NOWPayments webhook: unknown reference", reference, lookupErr);
+            return new Response("unknown reference", { status: 404 });
+          }
+
+          const rpc = intent.purpose === "seller_registration"
+            ? "confirm_seller_registration_payment"
+            : "credit_wallet_from_payment";
+          const args = intent.purpose === "seller_registration"
+            ? {
+                _provider_reference: reference,
+                _external_id: String(payload?.payment_id ?? ""),
+                _raw: payload,
+              }
+            : {
+                _provider: "nowpayments" as const,
+                _provider_reference: reference,
+                _external_id: String(payload?.payment_id ?? ""),
+                _raw: payload,
+              };
+
+          // @ts-expect-error dynamic rpc name is correct per the lookup above
+          const { error } = await supabaseAdmin.rpc(rpc, args);
           if (error) {
-            console.error("NOWPayments credit error:", error);
+            console.error(`NOWPayments ${rpc} error:`, error);
             return new Response(error.message, { status: 500 });
           }
         }
